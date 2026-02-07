@@ -134,5 +134,53 @@ def assign_category_to_todo(username:str, todo_id:int, category_text:str):
 
 # You can view a completed version of this lab at the following link
 
+##### EXERCISES #####
+@cli.command()
+def todo_info():
+    with get_session() as db:
+        all_users = db.exec(select(User)).all()
+        if not all_users:
+            print("No users found.")
+            return
+        
+        for user in all_users:
+            if user.todos:
+                for todo in user.todos:
+                    print(f"Todo ID: {todo.id}, Text: {todo.text}, Username: {user.username}, Done: {todo.done}\n")
+
+            print("\n")
+
+@cli.command()
+def delete_todo(todo_id: int):
+    with get_session() as db:
+        todo = db.exec(select(Todo).where(Todo.id == todo_id)).one_or_none()
+        if not todo:
+            print("Todo doesn't exist")
+            return
+
+        db.delete(todo)
+        db.commit()
+        print(f"Todo with id {todo_id} deleted successfully")
+
+@cli.command()
+def complete_user_tasks(username: str):
+    with get_session() as db:
+        user = db.exec(select(User).where(User.username == username)).one_or_none()
+        if not user:
+            print("User doesn't exist")
+            return
+        
+        if not user.todos:
+            print("User has no tasks to do")
+            return
+        
+        for todo in user.todos:
+            if not todo.done:
+                todo.done = True
+        db.commit()
+    
+        
+
+
 if __name__ == "__main__":
     cli()
