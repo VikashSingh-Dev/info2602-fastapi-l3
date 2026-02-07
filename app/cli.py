@@ -177,10 +177,8 @@ def complete_user_tasks(username: str):
         for todo in user.todos:
             if not todo.done:
                 todo.done = True
+
         db.commit()
     
-        
-
-
 if __name__ == "__main__":
     cli()
